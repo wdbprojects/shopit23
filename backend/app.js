@@ -1,10 +1,14 @@
 import express from "express";
 const app = express();
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
-import productRouter from "./routes/productRoutes.js";
 import connectDB from "./config/connectDB.js";
 import errorMiddleware from "./middlewares/errors.js";
 import process from "process";
+
+/* ROUTER */
+import productRouter from "./routes/productRoutes.js";
+import authRouter from "./routes/authRoutes.js";
 
 /* HANDLE UNCAUGHT EXECEPTIONS */
 process.on("uncaughtException", (err) => {
@@ -15,9 +19,12 @@ process.on("uncaughtException", (err) => {
 
 dotenv.config({ path: "./config/config.env" });
 app.use(express.json());
+/* COOKIE PARSER */
+app.use(cookieParser());
 
 /* ROUTES */
 app.use("/api/v1", productRouter);
+app.use("/api/v1", authRouter);
 
 /* ERROR MIDDLEWARE */
 app.use(errorMiddleware);

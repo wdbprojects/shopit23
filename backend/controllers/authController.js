@@ -115,5 +115,93 @@ const resetPassword = catchAsyncErrors(async (req, res, next) => {
   // SAVE TOKEN IN COOKIE
   saveTokenInCookie(user, 200, res);
 });
+// GET CURRENT USER PROFILE -> GET /api/v1/me
+const getUserProfile = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req?.user?._id);
+  res.status(200).json({ user: user });
+});
+// UPDATE USER PASSWORD -> PUT /api/v1/password/update
+const updatePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req?.user?._id).select("+password");
+  // check previous user password
+  const isPasswordMatched = await user.comparePassword(req.body.oldPassword);
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Old password is incorrect", 400));
+  }
+  user.password = req.body.password;
+  user.save();
+  res.status(200).json({ success: true, user: user });
+});
+// UPDATE USER PROFILE -> PUT /api/v1/me/update
+const updateProfile = catchAsyncErrors(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+  };
+  const options = {
+    new: true,
+  };
+  const user = await User.findByIdAndUpdate(
+    req?.user?._id,
+    newUserData,
+    options,
+  );
+  res.status(200).json({ success: true, user: user });
+});
+//  GET ALL USERS - ADMIN -> GET /api/v1/users
+const allUsers = catchAsyncErrors(async (req, res, next) => {
+  const users = await User.find();
+  res.status(200).json({ success: true, users: users });
+});
+//  GET USER BY ID - ADMIN -> GET /api/v1/users/:id
+const getUserById = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user)
+    return next(
+      new ErrorHandler(`User not found with ID: ${req.params.id}`, 404),
+    );
+  res.status(200).json({ success: true, user: user });
+});
+// UPDATE USER BY ID - ADMIN -> PUT /api/v1/users/:id
+const updateUserById = catchAsyncErrors(async (req, res, next) => {
+  const newUserData = {
+    name: req.body.name,
+    email: req.body.email,
+    role: req.body.role,
+  };
+  const options = {
+    new: true,
+  };
+  const user = await User.findByIdAndUpdate(
+    req.params.id,
+    newUserData,
+    options,
+  );
+  res.status(200).json({ success: true, user: user });
+});
+//  DELETE USER BY ID - ADMIN -> DELETE /api/v1/users/:id
+const deleteUserById = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+  if (!user)
+    return next(
+      new ErrorHandler(`User not found with ID: ${req.params.id}`, 404),
+    );
+  // TODO: Remove user avatar from cloudinary
+  await user.deleteOne();
+  res.status(200).json({ success: true, user: user });
+});
 
-export { registerUser, loginUser, logoutUser, forgotPassword, resetPassword };
+export {
+  registerUser,
+  loginUser,
+  logoutUser,
+  forgotPassword,
+  resetPassword,
+  getUserProfile,
+  updatePassword,
+  updateProfile,
+  allUsers,
+  getUserById,
+  updateUserById,
+  deleteUserById,
+};

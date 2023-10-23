@@ -9,6 +9,7 @@ import process from "process";
 /* ROUTER */
 import productRouter from "./routes/productRoutes.js";
 import authRouter from "./routes/authRoutes.js";
+import orderRouter from "./routes/orderRoutes.js";
 
 /* HANDLE UNCAUGHT EXECEPTIONS */
 process.on("uncaughtException", (err) => {
@@ -25,6 +26,7 @@ app.use(cookieParser());
 /* ROUTES */
 app.use("/api/v1", productRouter);
 app.use("/api/v1", authRouter);
+app.use("/api/v1", orderRouter);
 
 /* ERROR MIDDLEWARE */
 app.use(errorMiddleware);

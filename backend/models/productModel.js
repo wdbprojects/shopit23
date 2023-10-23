@@ -69,7 +69,7 @@ const productSchema = new Schema(
           type: Number,
           required: true,
         },
-        comments: {
+        comment: {
           type: String,
         },
       },

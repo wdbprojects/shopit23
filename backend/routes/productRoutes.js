@@ -6,6 +6,9 @@ import {
   getProductById,
   updateProduct,
   deleteProduct,
+  createProductReview,
+  getProductReviews,
+  deleteProductReview,
 } from "../controllers/productController.js";
 import {
   authorizedRoles,
@@ -34,6 +37,16 @@ router.delete(
   isAuthenticatedUser,
   authorizedRoles("admin"),
   deleteProduct,
+);
+
+/* REVIEWS */
+router.put("/reviews", isAuthenticatedUser, createProductReview);
+router.get("/reviews", isAuthenticatedUser, getProductReviews);
+router.delete(
+  "/admin/reviews",
+  isAuthenticatedUser,
+  authorizedRoles("admin"),
+  deleteProductReview,
 );
 
 export default router;
